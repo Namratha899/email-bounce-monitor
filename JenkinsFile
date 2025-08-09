@@ -1,0 +1,26 @@
+pipeline {
+  agent any
+  triggers {
+    cron('H 5 * * *')  // Runs daily at 5 AM
+  }
+  stages {
+    stage('Checkout') {
+      steps {
+        git 'https://github.com/Namratha899/email-bounce-monitor.git'
+      }
+    }
+    stage('Install Dependencies') {
+      steps {
+        sh 'sudo apt-get update'
+        sh 'sudo apt-get install -y python3 python3-pip mailutils'
+        sh 'pip3 install -r requirements.txt'
+      }
+    }
+    stage('Run Script') {
+      steps {
+        sh 'python3 main.py || echo "Script failed" | mail -s "Bounce Monitor Failed" your@email.com'
+      }
+    }
+  }
+}
+
