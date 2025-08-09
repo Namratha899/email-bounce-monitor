@@ -21,10 +21,7 @@ pipeline {
     }
     stage('Run Script') {
       steps {
-        sh '''
-          . venv/bin/activate
-          python main.py
-        '''
+        sh 'exit 1'
       }
     }
   }
