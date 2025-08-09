@@ -13,7 +13,7 @@ pipeline {
       steps {
         sh '''
           python3 -m venv venv
-          source venv/bin/activate
+          . venv/bin/activate
           pip install --upgrade pip
           pip install -r requirements.txt
         '''
@@ -22,7 +22,7 @@ pipeline {
     stage('Run Script') {
       steps {
         sh '''
-          source venv/bin/activate
+          . venv/bin/activate
           python main.py
         '''
       }
@@ -30,11 +30,9 @@ pipeline {
   }
   post {
     failure {
-      emailext (
-        subject: "Bounce Monitor Job Failed",
-        body: "The Bounce Monitor Jenkins job has failed. Please check logs.",
-        to: "your@email.com"
-      )
+      mail to: "namratha3004@gmail.com",
+           subject: "Bounce Monitor Job Failed",
+           body: "The Bounce Monitor Jenkins job has failed. Please check logs."
     }
   }
 }
