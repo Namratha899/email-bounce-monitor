@@ -11,8 +11,8 @@ pipeline {
     }
     stage('Install Dependencies') {
       steps {
-        sh 'sudo apt-get update'
-        sh 'sudo apt-get install -y python3 python3-pip mailutils'
+        sh 'apt-get update'
+        sh 'apt-get install -y python3 python3-pip mailutils'
         sh 'pip3 install -r requirements.txt'
       }
     }
