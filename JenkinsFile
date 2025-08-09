@@ -1,31 +1,40 @@
 pipeline {
-    agent any
-    triggers {
-        cron('H 5 * * *') // Runs daily at 5 AM
+  agent any
+  triggers {
+    cron('H 5 * * *')  // Runs daily at 5 AM
+  }
+  stages {
+    stage('Checkout') {
+      steps {
+        git 'https://github.com/Namratha899/email-bounce-monitor.git'
+      }
     }
-    stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/Namratha899/email-bounce-monitor.git'
-            }
-        }
-        stage('Install Dependencies') {
-            steps {
-                sh 'pip3 install -r requirements.txt'
-            }
-        }
-        stage('Run Script') {
-            steps {
-                sh 'python3 main.py'
-            }
-        }
+    stage('Setup Python Env and Install Dependencies') {
+      steps {
+        sh '''
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+        '''
+      }
     }
-    post {
-        failure {
-            mail to: 'namratha3004@gmail.com',
-                 subject: "Bounce Monitor Job Failed",
-                 body: "The Bounce Monitor Jenkins job has failed. Please check logs."
-        }
+    stage('Run Script') {
+      steps {
+        sh '''
+          source venv/bin/activate
+          python main.py
+        '''
+      }
     }
+  }
+  post {
+    failure {
+      emailext (
+        subject: "Bounce Monitor Job Failed",
+        body: "The Bounce Monitor Jenkins job has failed. Please check logs.",
+        to: "your@email.com"
+      )
+    }
+  }
 }
-
