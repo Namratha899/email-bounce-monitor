@@ -15,7 +15,7 @@ pipeline {
     stage('Run in Docker') {
       steps {
         script {
-          docker.image('python:3.12-slim').inside {
+          docker.image('python:3.12-slim').inside('-u root') {
             // Upgrade pip and install dependencies
             sh 'pip install -r requirements.txt'
 
