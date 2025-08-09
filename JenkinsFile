@@ -1,38 +1,38 @@
 pipeline {
   agent any
+
   triggers {
     cron('H 5 * * *')  // Runs daily at 5 AM
   }
+
   stages {
     stage('Checkout') {
       steps {
         git 'https://github.com/Namratha899/email-bounce-monitor.git'
       }
     }
-    stage('Setup Python Env and Install Dependencies') {
+
+    stage('Run in Docker') {
       steps {
-        sh '''
-          python3 -m venv venv
-          . venv/bin/activate
-          pip install --upgrade pip
-          pip install -r requirements.txt
-        '''
-      }
-    }
-    stage('Run Script') {
-      steps {
-        sh '''
-          . venv/bin/activate
-          python main.py
-        '''
+        script {
+          docker.image('python:3.12-slim').inside {
+            // Upgrade pip and install dependencies
+            sh 'pip install --upgrade pip'
+            sh 'pip install -r requirements.txt'
+
+            // Run your Python script
+            sh 'python main.py'
+          }
+        }
       }
     }
   }
+
   post {
     failure {
-      mail to: "namratha3004@gmail.com",
-           subject: "Bounce Monitor Job Failed",
-           body: "The Bounce Monitor Jenkins job has failed. Please check logs."
+      mail to: 'your@email.com',
+           subject: 'Bounce Monitor Job Failed',
+           body: 'The Bounce Monitor Jenkins job has failed. Please check logs.'
     }
   }
 }
